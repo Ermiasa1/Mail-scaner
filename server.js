@@ -57,4 +57,13 @@ mailListener.on("mail", function(mail, seqno, attributes){
 mailListener.on("attachment", function(attachment){
   console.log("attachment "+attachment.path);
   console.log("Attachement name "+attachment.fileName)
+  if(attachment.fileName.includes(".doc")){
+    var file = fs.createWriteStream("./attachFiles/resume/"+attachment.fileName);
+    file.on('pipe',(file)=>{
+        console.log('resume download ') 
+    }); 
+    attachment.stream.pipe(file)
+  }
+
+
 });
