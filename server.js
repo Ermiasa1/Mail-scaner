@@ -2,6 +2,10 @@ var MailListener = require("mail-listener4");
 var keys = require("./keys.js");
 var fs = require("fs");
 
+var pdService = require("./pdfService.js");
+var doService = require ("./docService.js");
+
+
 var mailListener = new MailListener({  
   username: keys.mail.user_name, 
   password: keys.mail.pass_word,  
@@ -57,13 +61,31 @@ mailListener.on("mail", function(mail, seqno, attributes){
 mailListener.on("attachment", function(attachment){
   console.log("attachment "+attachment.path);
   console.log("Attachement name "+attachment.fileName)
+// if the attachment is doc file, it will be created or downloaded in to docFile folder
+// this is a file creater
   if(attachment.fileName.includes(".doc")){
-    var file = fs.createWriteStream("./attachFiles/resume/"+attachment.fileName);
+    var file = fs.createWriteStream("./resumeAttachment/docFiles/"+attachment.fileName);
     file.on('pipe',(file)=>{
         console.log('resume download ') 
     }); 
-    attachment.stream.pipe(file)
-  }
+    attachment.stream.pipe(file);  
+        
+  };
+  // this function comes from servic js and will display plain text in terminal
+  doService.docConverter();
+  
+  // if the attachment is pdf file, it will be created or downloaded in to docFile folder
+  // this is a file creater
+  if(attachment.fileName.includes(".pdf")){
+    var file = fs.createWriteStream("./resumeAttachment/pdfFiles/"+attachment.fileName);
+    file.on('pipe',(file)=>{
+        console.log('resume download ') 
+    }); 
+    attachment.stream.pipe(file);  
+ 
 
+  };  
+  // this function comes from servic js and  will display plain text in terminal
+  pdService.pdReader();        
 
 });
